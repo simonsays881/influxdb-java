@@ -131,24 +131,26 @@ public class InfluxDBImpl implements InfluxDB {
 	}
 
 	@Override
-	public void write(final String database, final String retentionPolicy, final Point point) {
+	public Response write(final String database, final String retentionPolicy, final Point point) {
+		Response response = null;
 		if (this.batchEnabled.get()) {
 			BatchEntry batchEntry = new BatchEntry(point, database, retentionPolicy);
 			this.batchProcessor.put(batchEntry);
 		} else {
 			BatchPoints batchPoints = BatchPoints.database(database).retentionPolicy(retentionPolicy).build();
 			batchPoints.point(point);
-			this.write(batchPoints);
+			response = this.write(batchPoints);
 			this.unBatchedCount.incrementAndGet();
 		}
 		this.writeCount.incrementAndGet();
+		return response;
 	}
 
 	@Override
-	public void write(final BatchPoints batchPoints) {
+	public Response write(final BatchPoints batchPoints) {
 		this.batchedCount.addAndGet(batchPoints.getPoints().size());
 		TypedString lineProtocol = new TypedString(batchPoints.lineProtocol());
-		this.influxDBService.writePoints(
+		return this.influxDBService.writePoints(
 				this.username,
 				this.password,
 				batchPoints.getDatabase(),
@@ -160,8 +162,8 @@ public class InfluxDBImpl implements InfluxDB {
 	}
 
 	@Override
-	public void write(final String database, final String retentionPolicy, final ConsistencyLevel consistency, final String records) {
-		this.influxDBService.writePoints(
+	public Response write(final String database, final String retentionPolicy, final ConsistencyLevel consistency, final String records) {
+		return this.influxDBService.writePoints(
 				this.username,
 				this.password,
 				database,
@@ -171,9 +173,9 @@ public class InfluxDBImpl implements InfluxDB {
 				new TypedString(records));
 	}
 	@Override
-	public void write(final String database, final String retentionPolicy, final ConsistencyLevel consistency, final List<String> records) {
+	public Response write(final String database, final String retentionPolicy, final ConsistencyLevel consistency, final List<String> records) {
 		final String joinedRecords = Joiner.on("\n").join(records);
-		write(database, retentionPolicy, consistency, joinedRecords);
+		return write(database, retentionPolicy, consistency, joinedRecords);
 	}
 
 	/**

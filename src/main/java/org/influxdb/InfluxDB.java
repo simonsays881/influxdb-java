@@ -2,12 +2,12 @@ package org.influxdb;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Pong;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
+import retrofit.client.Response;
 
 /**
  * Interface with all available methods to access a InfluxDB database.
@@ -123,7 +123,7 @@ public interface InfluxDB {
 	 * @param point
 	 *            The point to write
 	 */
-	public void write(final String database, final String retentionPolicy, final Point point);
+	public Response write(final String database, final String retentionPolicy, final Point point);
 
 	/**
 	 * Write a set of Points to the influxdb database with the new (>= 0.9.0rc32) lineprotocol.
@@ -132,7 +132,7 @@ public interface InfluxDB {
 	 *
 	 * @param batchPoints
 	 */
-	public void write(final BatchPoints batchPoints);
+	public Response write(final BatchPoints batchPoints);
 
 	/**
 	 * Write a set of Points to the influxdb database with the string records.
@@ -141,7 +141,7 @@ public interface InfluxDB {
 	 *
 	 * @param records
 	 */
-	public void write(final String database, final String retentionPolicy, final ConsistencyLevel consistency, final String records);
+	public Response write(final String database, final String retentionPolicy, final ConsistencyLevel consistency, final String records);
 
 	/**
 	 * Write a set of Points to the influxdb database with the list of string records.
@@ -150,7 +150,7 @@ public interface InfluxDB {
 	 *
 	 * @param records
 	 */
-	public void write(final String database, final String retentionPolicy, final ConsistencyLevel consistency, final List<String> records);
+	public Response write(final String database, final String retentionPolicy, final ConsistencyLevel consistency, final List<String> records);
 
 	/**
 
